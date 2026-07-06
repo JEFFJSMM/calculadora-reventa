@@ -1,0 +1,344 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Calculadora de Reventa — ¿A cuánto vendo este par?</title>
+<meta name="description" content="Calculadora gratis para revendedores de sneakers: costo + envío + comisión + margen deseado = tu precio de venta con desglose visual. Hecha en Medellín por SNKRS S.">
+<meta property="og:title" content="¿A cuánto vendo este par? — Calculadora de reventa">
+<meta property="og:description" content="Costo + envío + comisión + margen = tu precio justo. Gratis, para la comunidad sneaker.">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><rect width='100' height='100' rx='18' fill='%231c3fd6'/><text x='50' y='72' font-size='58' font-family='Arial Black' font-weight='900' fill='white' text-anchor='middle'>%24</text></svg>">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;900&family=Inter:wght@400;500;600;700&family=Space+Mono&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#0a0a12; --surface:#0f0f1c; --paper:#f3efe6; --cobalt:#1c3fd6; --cobalt-2:#4d6fff;
+  --chrome:#b8c4d0; --ink-line:rgba(184,196,208,.15);
+  /* Paleta de datos — validada CVD sobre superficie oscura */
+  --c-costo:#2ea896; --c-envio:#8a5cf6; --c-fee:#b8842a; --c-ganancia:#4d6fff;
+  --display:"Big Shoulders Display",Impact,sans-serif; --body:"Inter",system-ui,sans-serif; --mono:"Space Mono",monospace;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--ink);color:var(--paper);font-family:var(--body);line-height:1.55;min-height:100svh;
+  background-image:linear-gradient(var(--ink-line) 1px,transparent 1px),linear-gradient(90deg,var(--ink-line) 1px,transparent 1px);
+  background-size:90px 90px;background-attachment:fixed}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit}
+.mono{font-family:var(--mono)}
+.wrap{width:min(760px,93%);margin:0 auto;padding-bottom:70px}
+
+header{display:flex;align-items:center;justify-content:space-between;padding:24px 0 8px}
+.brand{display:flex;align-items:center;gap:9px}
+.mark{width:30px;height:30px;display:grid;place-items:center;background:linear-gradient(135deg,var(--cobalt),var(--cobalt-2));color:#fff;font-family:var(--display);font-weight:900;font-size:17px;border-radius:7px}
+.brand strong{font-family:var(--display);font-weight:700;font-size:17px;letter-spacing:.12em}
+header .tag{font-family:var(--mono);font-size:9px;letter-spacing:.2em;color:var(--chrome)}
+
+.hero{padding:36px 0 30px}
+h1{font-family:var(--display);font-weight:900;font-size:clamp(42px,7vw,64px);line-height:.95;text-transform:uppercase}
+h1 span{background:linear-gradient(120deg,var(--cobalt-2),var(--cobalt));-webkit-background-clip:text;background-clip:text;color:transparent}
+.lead{color:var(--chrome);font-size:15px;margin-top:14px;max-width:540px}
+
+.card{background:var(--surface);border:1px solid var(--ink-line);border-radius:14px;padding:26px;margin-bottom:22px}
+.card h2{font-family:var(--mono);font-size:11px;letter-spacing:.22em;color:var(--chrome);font-weight:400;text-transform:uppercase;margin-bottom:20px}
+
+.fields{display:grid;grid-template-columns:1fr 1fr;gap:18px}
+.f label{display:block;font-size:13px;font-weight:600;margin-bottom:7px}
+.f .hint{font-size:11.5px;color:var(--chrome);font-weight:400;display:block;margin-top:5px}
+.f input[type=text]{width:100%;background:var(--ink);border:1px solid var(--ink-line);border-radius:8px;padding:13px 15px;color:var(--paper);font-size:16px;font-family:var(--mono);outline:none;transition:border-color .15s}
+.f input[type=text]:focus{border-color:var(--cobalt-2)}
+.prefix{position:relative}
+.prefix input{padding-left:32px}
+.prefix::before{content:"$";position:absolute;left:14px;top:13px;font-family:var(--mono);color:var(--chrome);font-size:15px}
+
+.slider-row{grid-column:1 / -1}
+.slider-head{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:8px}
+.slider-val{font-family:var(--mono);font-size:18px;color:var(--cobalt-2);font-weight:700}
+input[type=range]{width:100%;-webkit-appearance:none;appearance:none;height:6px;border-radius:3px;background:linear-gradient(90deg,var(--cobalt-2) var(--fill,35%),rgba(184,196,208,.18) var(--fill,35%));outline:none}
+input[type=range]::-webkit-slider-thumb{-webkit-appearance:none;width:22px;height:22px;border-radius:50%;background:var(--cobalt-2);border:3px solid var(--ink);box-shadow:0 2px 10px rgba(77,111,255,.5);cursor:grab}
+input[type=range]::-moz-range-thumb{width:18px;height:18px;border-radius:50%;background:var(--cobalt-2);border:3px solid var(--ink);cursor:grab}
+
+/* Resultado */
+.hero-num-label{font-size:13px;font-weight:600;color:var(--chrome);margin-bottom:4px}
+.hero-num{font-size:clamp(44px,8vw,58px);font-weight:700;letter-spacing:-.01em;line-height:1.1}
+.hero-sub{font-size:13.5px;color:var(--chrome);margin-top:2px}
+.hero-sub b{color:var(--paper)}
+
+.tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-top:22px}
+.tile{background:var(--ink);border:1px solid var(--ink-line);border-radius:10px;padding:14px 16px}
+.tile .t-label{font-size:11px;color:var(--chrome);margin-bottom:4px}
+.tile .t-value{font-size:19px;font-weight:600}
+
+/* Barra apilada de composición */
+.bar-wrap{margin-top:26px}
+.bar{display:flex;gap:2px;height:22px;border-radius:5px;overflow:hidden;background:var(--surface)}
+.seg{position:relative;display:flex;align-items:center;justify-content:center;transition:width .35s ease;min-width:0;cursor:default}
+.seg:first-child{border-radius:4px 0 0 4px}
+.seg:last-child{border-radius:0 4px 4px 0}
+.seg .seg-label{font-family:var(--mono);font-size:10px;font-weight:700;color:#0a0a12;white-space:nowrap}
+.legend{display:grid;grid-template-columns:1fr 1fr;gap:8px 22px;margin-top:14px}
+.lg{display:flex;align-items:center;gap:9px;font-size:12.5px}
+.lg .sw{width:10px;height:10px;border-radius:3px;flex-shrink:0}
+.lg .lg-name{color:var(--chrome);flex:1}
+.lg .lg-val{font-family:var(--mono);font-size:12px}
+.tooltip{position:fixed;z-index:50;background:var(--surface);border:1px solid rgba(77,111,255,.4);border-radius:8px;padding:9px 12px;font-size:12px;pointer-events:none;display:none;box-shadow:0 10px 30px rgba(0,0,0,.5)}
+.tooltip .tt-name{color:var(--chrome);font-size:11px}
+.tooltip .tt-val{font-family:var(--mono);font-weight:700}
+
+/* Inverso */
+.inverse .fields{grid-template-columns:1fr}
+.verdict{margin-top:16px;font-size:14px;padding:14px 16px;border-radius:9px;background:var(--ink);border:1px solid var(--ink-line)}
+.verdict b{font-family:var(--mono)}
+
+.actions{display:flex;gap:12px;margin-top:22px;flex-wrap:wrap}
+.btn{display:inline-flex;align-items:center;gap:8px;font-weight:600;font-size:13.5px;padding:12px 22px;border-radius:8px;transition:.18s}
+.btn-primary{background:linear-gradient(135deg,var(--cobalt),var(--cobalt-2));color:#fff}
+.btn-primary:hover{transform:translateY(-2px);box-shadow:0 10px 26px rgba(77,111,255,.4)}
+.btn-ghost{border:1px solid var(--ink-line);color:var(--chrome)}
+.btn-ghost:hover{border-color:var(--cobalt-2);color:var(--paper)}
+
+footer{text-align:center;padding:10px 0 34px;font-family:var(--mono);font-size:10px;letter-spacing:.18em;color:rgba(184,196,208,.55)}
+footer a{color:var(--cobalt-2)}
+
+.toast{position:fixed;left:50%;bottom:-80px;transform:translateX(-50%);background:var(--surface);border:1px solid rgba(77,111,255,.5);padding:12px 22px;border-radius:8px;font-family:var(--mono);font-size:12px;transition:bottom .3s;z-index:60}
+.toast.show{bottom:24px}
+
+@media(max-width:640px){
+  .fields{grid-template-columns:1fr}
+  .tiles{grid-template-columns:1fr;gap:10px}
+  .legend{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <header>
+    <a class="brand" href="https://instagram.com/snkrs.s" target="_blank" rel="noopener"><span class="mark">S</span><strong>SNKRS&nbsp;S</strong></a>
+    <span class="tag">HERRAMIENTA GRATIS · MEDELLÍN CO</span>
+  </header>
+
+  <section class="hero">
+    <h1>¿A cuánto<br>vendo <span>este par?</span></h1>
+    <p class="lead">Calculadora para revendedores de sneakers: mete tus costos y el margen que quieres, y te decimos el precio justo — sin vender a pérdida ni espantar clientes.</p>
+  </section>
+
+  <!-- Entradas -->
+  <section class="card">
+    <h2>▮ Tus números</h2>
+    <div class="fields">
+      <div class="f">
+        <label for="inCosto">Costo del par</label>
+        <div class="prefix"><input type="text" id="inCosto" inputmode="numeric" value="120.000"></div>
+        <span class="hint">Lo que te cuesta a ti conseguirlo</span>
+      </div>
+      <div class="f">
+        <label for="inEnvio">Envío + empaque</label>
+        <div class="prefix"><input type="text" id="inEnvio" inputmode="numeric" value="15.000"></div>
+        <span class="hint">Traerlo + caja, papel, etiqueta, domicilio</span>
+      </div>
+      <div class="f">
+        <label for="inFee">Comisión de cobro (%)</label>
+        <input type="text" id="inFee" inputmode="decimal" value="0">
+        <span class="hint">Nequi/Daviplata = 0 · pasarelas ≈ 3–5</span>
+      </div>
+      <div class="f slider-row">
+        <div class="slider-head">
+          <label for="inMargen">Margen deseado (sobre tu costo)</label>
+          <span class="slider-val" id="margenVal">35%</span>
+        </div>
+        <input type="range" id="inMargen" min="5" max="100" step="1" value="35">
+      </div>
+    </div>
+  </section>
+
+  <!-- Resultado -->
+  <section class="card">
+    <h2>▮ Tu precio</h2>
+    <p class="hero-num-label">Véndelo en</p>
+    <p class="hero-num" id="precioHero">$0</p>
+    <p class="hero-sub">Ganancia por par: <b id="gananciaLine">$0</b> · <span id="margenLine">0% real sobre el precio</span></p>
+
+    <div class="tiles">
+      <div class="tile"><div class="t-label">Precio exacto (sin redondear)</div><div class="t-value mono" id="tExacto">$0</div></div>
+      <div class="tile"><div class="t-label">Punto de equilibrio</div><div class="t-value mono" id="tEquilibrio">$0</div></div>
+      <div class="tile"><div class="t-label">Ganancia vendiendo 10 pares</div><div class="t-value mono" id="tDiez">$0</div></div>
+    </div>
+
+    <div class="bar-wrap">
+      <div class="bar" id="bar"></div>
+      <div class="legend" id="legend"></div>
+    </div>
+
+    <div class="actions">
+      <button class="btn btn-primary" id="btnCopy">📋 Copiar resumen</button>
+      <button class="btn btn-ghost" id="btnReset">Reiniciar</button>
+    </div>
+  </section>
+
+  <!-- Inverso -->
+  <section class="card inverse">
+    <h2>▮ ¿Ya tienes un precio en mente?</h2>
+    <div class="fields">
+      <div class="f">
+        <label for="inPrecioManual">Si lo vendes en...</label>
+        <div class="prefix"><input type="text" id="inPrecioManual" inputmode="numeric" placeholder="180.000"></div>
+      </div>
+    </div>
+    <div class="verdict" id="verdict" style="display:none"></div>
+  </section>
+
+  <footer>
+    HECHA POR <a href="https://instagram.com/snkrs.s" target="_blank" rel="noopener">SNKRS S</a> PARA LA COMUNIDAD SNEAKER · MEDELLÍN, COLOMBIA
+  </footer>
+</div>
+
+<div class="tooltip" id="tooltip"><div class="tt-name"></div><div class="tt-val"></div></div>
+<div class="toast" id="toast"></div>
+
+<script>
+'use strict';
+const $ = s => document.querySelector(s);
+const fmt = v => '$' + Math.round(v).toLocaleString('es-CO');
+
+// Serie fija: identidad → color (orden nunca cambia)
+const SERIES = [
+  { key:'costo',    name:'Costo del par',   color:'var(--c-costo)' },
+  { key:'envio',    name:'Envío + empaque', color:'var(--c-envio)' },
+  { key:'fee',      name:'Comisión',        color:'var(--c-fee)' },
+  { key:'ganancia', name:'Tu ganancia',     color:'var(--c-ganancia)' }
+];
+
+const parseNum = s => Number(String(s).replace(/[^\d.,]/g,'').replace(/\./g,'').replace(',','.')) || 0;
+const parsePct = s => Math.max(0, Math.min(30, Number(String(s).replace(',','.').replace(/[^\d.]/g,'')) || 0));
+
+function formatInput(el){
+  const n = parseNum(el.value);
+  el.value = n ? n.toLocaleString('es-CO') : '';
+}
+
+function state(){
+  return {
+    costo: parseNum($('#inCosto').value),
+    envio: parseNum($('#inEnvio').value),
+    fee: parsePct($('#inFee').value) / 100,
+    margen: Number($('#inMargen').value) / 100
+  };
+}
+
+function calc(){
+  const s = state();
+  const costoTotal = s.costo + s.envio;
+  // La comisión se cobra sobre el precio de venta:
+  const exacto = costoTotal * (1 + s.margen) / (1 - s.fee || 1);
+  const sugerido = Math.ceil(exacto / 1000) * 1000;   // redondeo comercial hacia arriba
+  const feeVal = sugerido * s.fee;
+  const ganancia = sugerido - feeVal - costoTotal;
+  const equilibrio = Math.ceil(costoTotal / (1 - s.fee || 1) / 100) * 100;
+  const margenReal = sugerido > 0 ? ganancia / sugerido * 100 : 0;
+  return { ...s, costoTotal, exacto, sugerido, feeVal, ganancia, equilibrio, margenReal };
+}
+
+function render(){
+  const r = calc();
+  $('#margenVal').textContent = Math.round(r.margen * 100) + '%';
+  $('#inMargen').style.setProperty('--fill', ((r.margen*100 - 5) / 95 * 100) + '%');
+
+  $('#precioHero').textContent = fmt(r.sugerido);
+  $('#gananciaLine').textContent = fmt(r.ganancia);
+  $('#margenLine').textContent = r.margenReal.toFixed(1) + '% real sobre el precio';
+  $('#tExacto').textContent = fmt(r.exacto);
+  $('#tEquilibrio').textContent = fmt(r.equilibrio);
+  $('#tDiez').textContent = fmt(r.ganancia * 10);
+
+  // Barra apilada: composición del precio de venta
+  const parts = { costo: r.costo, envio: r.envio, fee: r.feeVal, ganancia: Math.max(0, r.ganancia) };
+  const total = Object.values(parts).reduce((a,b)=>a+b,0) || 1;
+  $('#bar').innerHTML = SERIES.map(sr => {
+    const v = parts[sr.key];
+    const pct = v / total * 100;
+    return v <= 0 ? '' : `<div class="seg" data-name="${sr.name}" data-val="${fmt(v)} · ${pct.toFixed(0)}%" style="width:${pct}%;background:${sr.color}"><span class="seg-label">${pct.toFixed(0)}%</span></div>`;
+  }).join('');
+  // Etiqueta interna solo si cabe con aire; si no, la lleva leyenda + tooltip
+  requestAnimationFrame(() => {
+    document.querySelectorAll('.seg').forEach(seg => {
+      const label = seg.querySelector('.seg-label');
+      if (label && seg.offsetWidth < label.offsetWidth + 18) label.style.display = 'none';
+    });
+  });
+
+  $('#legend').innerHTML = SERIES.map(sr => {
+    const v = parts[sr.key];
+    return `<div class="lg"><span class="sw" style="background:${sr.color}"></span><span class="lg-name">${sr.name}</span><span class="lg-val">${fmt(v)}</span></div>`;
+  }).join('');
+
+  renderVerdict();
+  localStorage.setItem('calc-reventa', JSON.stringify({
+    costo: $('#inCosto').value, envio: $('#inEnvio').value,
+    fee: $('#inFee').value, margen: $('#inMargen').value
+  }));
+}
+
+function renderVerdict(){
+  const precio = parseNum($('#inPrecioManual').value);
+  const box = $('#verdict');
+  if (!precio) { box.style.display = 'none'; return; }
+  const r = calc();
+  const gan = precio - precio * r.fee - r.costoTotal;
+  const mg = precio > 0 ? gan / precio * 100 : 0;
+  box.style.display = 'block';
+  box.innerHTML = gan <= 0
+    ? `😬 A <b>${fmt(precio)}</b> pierdes <b>${fmt(Math.abs(gan))}</b> por par. Tu punto de equilibrio es <b>${fmt(r.equilibrio)}</b>.`
+    : `A <b>${fmt(precio)}</b> ganas <b>${fmt(gan)}</b> por par (${mg.toFixed(1)}% del precio). ${mg < 15 ? 'Margen apretado — cualquier imprevisto se lo come 😅' : mg > 45 ? 'Margen muy cómodo 🔥 revisa que el mercado lo aguante.' : 'Margen sano para reventa 👌'}`;
+}
+
+// Tooltip por segmento
+const tt = $('#tooltip');
+document.addEventListener('mousemove', e => {
+  const seg = e.target.closest('.seg');
+  if (!seg) { tt.style.display = 'none'; return; }
+  tt.querySelector('.tt-name').textContent = seg.dataset.name;
+  tt.querySelector('.tt-val').textContent = seg.dataset.val;
+  tt.style.display = 'block';
+  tt.style.left = Math.min(e.clientX + 14, innerWidth - 170) + 'px';
+  tt.style.top = (e.clientY - 48) + 'px';
+});
+
+// Eventos
+['inCosto','inEnvio','inPrecioManual'].forEach(id => {
+  $('#'+id).addEventListener('input', e => { formatInput(e.target); render(); });
+});
+$('#inFee').addEventListener('input', render);
+$('#inMargen').addEventListener('input', render);
+
+$('#btnReset').addEventListener('click', () => {
+  $('#inCosto').value = '120.000'; $('#inEnvio').value = '15.000';
+  $('#inFee').value = '0'; $('#inMargen').value = 35; $('#inPrecioManual').value = '';
+  render();
+});
+
+$('#btnCopy').addEventListener('click', () => {
+  const r = calc();
+  const text = `👟 CÁLCULO DE REVENTA\n\nCosto del par: ${fmt(r.costo)}\nEnvío + empaque: ${fmt(r.envio)}\nComisión: ${fmt(r.feeVal)} (${(r.fee*100).toFixed(1)}%)\n\n💰 VENDER EN: ${fmt(r.sugerido)}\n✅ Ganancia por par: ${fmt(r.ganancia)} (${r.margenReal.toFixed(1)}%)\n📦 Por 10 pares: ${fmt(r.ganancia*10)}\n\nCalculadora gratis de @snkrs.s`;
+  navigator.clipboard.writeText(text)
+    .then(() => toast('📋 Resumen copiado — pégalo donde quieras'))
+    .catch(() => toast('⚠ No se pudo copiar'));
+});
+
+function toast(msg){
+  const t = $('#toast'); t.textContent = msg; t.classList.add('show');
+  clearTimeout(toast._t); toast._t = setTimeout(() => t.classList.remove('show'), 3000);
+}
+
+// Restaurar última sesión
+try {
+  const saved = JSON.parse(localStorage.getItem('calc-reventa'));
+  if (saved) {
+    $('#inCosto').value = saved.costo; $('#inEnvio').value = saved.envio;
+    $('#inFee').value = saved.fee; $('#inMargen').value = saved.margen;
+  }
+} catch {}
+render();
+</script>
+</body>
+</html>
