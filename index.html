@@ -114,7 +114,7 @@ footer a{color:var(--cobalt-2)}
 
 <div class="wrap">
   <header>
-    <a class="brand" href="https://instagram.com/snkrs.s" target="_blank" rel="noopener"><span class="mark">S</span><strong>SNKRS&nbsp;S</strong></a>
+    <a class="brand" href="https://github.com/JEFFJSMM" target="_blank" rel="noopener"><span class="mark">S</span><strong>SNKRS&nbsp;S</strong></a>
     <span class="tag">HERRAMIENTA GRATIS · MEDELLÍN CO</span>
   </header>
 
@@ -189,7 +189,7 @@ footer a{color:var(--cobalt-2)}
   </section>
 
   <footer>
-    HECHA POR <a href="https://instagram.com/snkrs.s" target="_blank" rel="noopener">SNKRS S</a> PARA LA COMUNIDAD SNEAKER · MEDELLÍN, COLOMBIA
+    HECHA POR <a href="https://github.com/JEFFJSMM" target="_blank" rel="noopener">JEFFJSMM</a> PARA LA COMUNIDAD SNEAKER · MEDELLÍN, COLOMBIA
   </footer>
 </div>
 
@@ -319,7 +319,7 @@ $('#btnReset').addEventListener('click', () => {
 
 $('#btnCopy').addEventListener('click', () => {
   const r = calc();
-  const text = `👟 CÁLCULO DE REVENTA\n\nCosto del par: ${fmt(r.costo)}\nEnvío + empaque: ${fmt(r.envio)}\nComisión: ${fmt(r.feeVal)} (${(r.fee*100).toFixed(1)}%)\n\n💰 VENDER EN: ${fmt(r.sugerido)}\n✅ Ganancia por par: ${fmt(r.ganancia)} (${r.margenReal.toFixed(1)}%)\n📦 Por 10 pares: ${fmt(r.ganancia*10)}\n\nCalculadora gratis de @snkrs.s`;
+  const text = `👟 CÁLCULO DE REVENTA\n\nCosto del par: ${fmt(r.costo)}\nEnvío + empaque: ${fmt(r.envio)}\nComisión: ${fmt(r.feeVal)} (${(r.fee*100).toFixed(1)}%)\n\n💰 VENDER EN: ${fmt(r.sugerido)}\n✅ Ganancia por par: ${fmt(r.ganancia)} (${r.margenReal.toFixed(1)}%)\n📦 Por 10 pares: ${fmt(r.ganancia*10)}\n\nCalculadora gratis: jeffjsmm.github.io/calculadora-reventa`;
   navigator.clipboard.writeText(text)
     .then(() => toast('📋 Resumen copiado — pégalo donde quieras'))
     .catch(() => toast('⚠ No se pudo copiar'));

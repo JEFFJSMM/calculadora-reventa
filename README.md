@@ -18,5 +18,5 @@ Los colores del desglose están validados para daltonismo (deuteranopia/protanop
 tritanopia) y contraste sobre fondo oscuro. Una sola página HTML, sin frameworks.
 
 ---
-Hecha por [SNKRS S](https://instagram.com/snkrs.s) para la comunidad sneaker · Medellín, Colombia 🇨🇴
+Hecha por [JEFFJSMM](https://github.com/JEFFJSMM) para la comunidad sneaker · Medellín, Colombia 🇨🇴
 Construida con [Claude Code](https://claude.com/claude-code) 🤖
